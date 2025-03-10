@@ -1,0 +1,50 @@
+Here Backend_Server provide http route to send problem as well as a socket
+connection to get the status realtime.
+	- http://localhost:3000/submit_solution : post request
+	- ws://localhost:3000/solutionId=solution_1_5 : socket connect
+	- body
+		- language : cpp
+		- file : choose the file
+		- problem_id : 1
+		- user_id : 5
+
+
+
+***
+
+Worker (python) : take the code from the queue and send for docker run
+	docker_command = [
+            "docker", "run", "--rm", "--network", "judge",
+            "-e", f"solutionId={filename}",
+            "-v", f"{problem_dir}:/judge/problem",
+            "-v", f"{solution_dir}:/judge/solution",
+            docker_image
+        ]
+
+
+***
+
+Online Judge
+Here the dockerfile is here to build the docker image.
+
+	docker build -t online-judge .
+
+From this directory online-judge image can be tested
+
+	docker run --rm --network judge \
+		 -e solutionId=solution_1_5 \
+		 -v "$(pwd)/problems/problem_1:/judge/problem" \
+		 -v "$(pwd)/solutions/solution_1_5:/judge/solution" \
+		 temp-judge
+
+
+*** RabbitMQ
+
+ check if rabbitmq container is listed in judge network
+	: docker network inspect judge
+ start rabbitmq container
+	: docker start rabbitmq
+ if no container then start new rabbitmq
+	: docker network create judge
+	: docker run -d --network judge --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:management
+ go to localhost:15672 to inspect rabbitMQ
