@@ -24,24 +24,33 @@ const clients: Record<string, WebSocket> = {};
 const amqpUrl = 'amqp://localhost';
 let channel: amqplib.Channel;
 
+/*
+    message in exchange in this formate.
+        submissionId,
+        status,
+        isFinal,
+        time
+*/
+
+
 async function connectRabbitMQ() {
     const connection = await amqplib.connect(amqpUrl);
     channel = await connection.createChannel();
     const codeQueue = 'code_queue';
     await channel.assertQueue(codeQueue, { durable: false });
 
-    const solutionExchange = 'solution-status';
+    const solutionExchange = 'submission-status';
     await channel.assertExchange(solutionExchange, 'fanout', {durable:false});
     const { queue } = await channel.assertQueue('', {exclusive:true});
-    await channel.bindQueue(queue, 'solution-status', '');
+    await channel.bindQueue(queue, 'submission-status', '');
 
     channel.consume(queue, (msg) => {
         if(msg){
             const data = JSON.parse(msg.content.toString());
-            const { solutionId, status } = data;
+            const { submissionId, status, time } = data;
 
-            if(clients[solutionId]){
-                clients[solutionId].send(JSON.stringify({solutionId, status}));
+            if(clients[submissionId]){
+                clients[submissionId].send(JSON.stringify({status, time}));
             }
         }
     }, {noAck : true});
@@ -57,20 +66,19 @@ app.post('/submit_solution', upload.single('file'), async (req: any, res: any) =
         // Extract code from file or text input
         const code = req.file ? req.file.buffer.toString() : req.body.code;
         const language = req.body.language || 'cpp';
-        const problem_id = req.body.problem_id;
-        const user_id = req.body.user_id;
+        const problemId = req.body.problemId;
+        const submissionId = req.body.submissionId;
 
         // Push the code to RabbitMQ queue
         const codeData = {
-            user_id,
-            problem_id,
-            filename: `solution_${problem_id}_${user_id}`,
+            submissionId,
+            problemId,
             language,
             code
         };
         const options = {
             headers: {
-                retry_count: 0,
+                retryCount: 0,
             }
         };
         const queue = 'code_queue';
@@ -91,17 +99,17 @@ app.post('/submit_solution', upload.single('file'), async (req: any, res: any) =
 // Websocket Logic
 wss.on('connection', (ws, req) => {
     const params = new URLSearchParams(req.url?.split('?')[1]);
-    const solutionId = params.get('solutionId')?.toString();
+    const Id = params.get('id')?.toString();
 
-    if(!solutionId){
+    if(!Id){
         ws.close();
         return;
     }
-    console.log(`User is connected for ${solutionId}`);
-    clients[solutionId] = ws;
+    console.log(`User is connected for submission ${Id}`);
+    clients[Id] = ws;
     
     ws.on('close', ()=> {
-        delete clients[solutionId];
+        delete clients[Id];
     })
 
 })
