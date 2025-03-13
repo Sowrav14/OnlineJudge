@@ -4,116 +4,119 @@ import time
 import re
 from saveit import save_code_locally
 from runit import run_code_in_docker
+from datetime import datetime
+
+RABBITMQ_PARAM='localhost'
 
 
 # Establish a connection to RabbitMQ
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_PARAM))
 channel = connection.channel()
 
 # Declare the queue and exchange
 channel.queue_declare(queue='code_queue')
-channel.exchange_declare(exchange='solution-status', exchange_type='fanout')
+channel.exchange_declare(exchange='submission-status', exchange_type='fanout')
 
 # Publish current status in the exchange
-def publish_status(filename, status):
-    message = json.dumps({"solutionId":filename, "status":status})
-    channel.basic_publish(exchange='solution-status', routing_key='', body=message)
+def publish_status(submissionId, status, isFinal):
+    currentTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    message = json.dumps({
+        "submissionId":submissionId, 
+        "status":status, 
+        "isFinal":isFinal, 
+        "time":currentTime
+    })
+    channel.basic_publish(exchange='submission-status', routing_key='', body=message)
 
+# Parse the final verdict of this form 
+#   - Final Verdict : 'AC'
+#   - Time : 1.2
+#   - Memory : 128
+#   - Total Test : 10
+#   - Passed Test : 5
+pattern = r"Final Verdict : (?P<verdict>\w+)\n\s*Time : (?P<time>[\d.]+)\n\s*Memory : (?P<memory>\d+)\n\s*Total Test : (?P<totalTest>\d+)\n\s*Passed Test : (?P<passedTest>\d+)\n"
 def parse_verdict(verdict):
-    match = re.search(r"Final Verdict : (\w+)\nTest passed : (\d+)\n", verdict)
+    match = re.search(pattern, verdict)
     if match:
-        status = match.group(1)
-        tests = int(match.group(2))
-        return status, tests
+        data = match.groupdict()
+        return data
     else :
-        return None, None
+        return None
 
 def callback(ch, method, properties, body):
     # Decode the incoming message
-    code_data = json.loads(body)
-    retry_count = properties.headers.get('retry_count', 0)
+    codeData = json.loads(body)
+    retryCount = properties.headers.get('retryCount', 0)
     
-    filename = code_data['filename']
-    problem_id = code_data['problem_id']
-    user_id = code_data['user_id']
-    language = code_data['language']
-    code = code_data['code']
+    submissionId = codeData['submissionId']
+    problemId = codeData['problemId']
+    language = codeData['language']
+    code = codeData['code']
 
-    # print(f"Retry : {retry_count} of 3")
-    if retry_count > 3 :
+    # print(f"Retry : {retryCount} of 3")
+    if retryCount >= 2 :
         # print("Max retry exceeded")
-        publish_status(filename, "Failed : Max retry exceeded")
+        publish_status(submissionId, "Failed : Max retry exceeded", True)
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
         return
 
 
-    print(f"Received Solution : {code_data['filename']}")
-    publish_status(filename, "Queued")
-    time.sleep(5)
-    publish_status(filename, "Recieved in worker")
+    print(f"Received Submission : {codeData['submissionId']}")
+    publish_status(submissionId, "Received", False)
     time.sleep(2)
-    publish_status(filename, "Getting ready for submission")
+    publish_status(submissionId, "Processing", False)
     time.sleep(2)
-    solution_dir = save_code_locally(code=code, filename=filename, language=language)
 
+    solution_dir = save_code_locally(code=code, submissionId=submissionId, language=language)
     if(solution_dir == None) :
-        # print(f"Retry...")
-        publish_status(filename, "Retrying : Error in worker")
-        retry_count = retry_count + 1
-        body = json.dumps(code_data)
+        publish_status(submissionId, "Retrying : Error Saving", False)
+        retryCount = retryCount + 1
+        body = json.dumps(codeData)
         ch.basic_publish(exchange='',
-                     routing_key='code_queue',
-                     body=body,
-                     properties=pika.BasicProperties(
-                         headers={'retry_count': retry_count}
-                     ))
+            routing_key='code_queue',
+            body=body,
+            properties=pika.BasicProperties(
+                headers={'retryCount': retryCount}
+            )
+        )
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
         return None
     
-    publish_status(filename, "Ready for judging.")
-    time.sleep(2)
-    publish_status(filename, "Running in docker")
+    publish_status(submissionId, "Submitted", False)
     time.sleep(2)
 
-    verdict = run_code_in_docker(solution_dir, problem_id, filename)
-
+    verdict = run_code_in_docker(problemId, solution_dir, submissionId)
     if(verdict == None) :
-        publish_status(filename, "Retrying : Error in Docker")
-        retry_count = retry_count + 1
-        body = json.dumps(code_data)
+        publish_status(submissionId, "Retrying : Error Running", False)
+        retryCount = retryCount + 1
+        body = json.dumps(codeData)
         ch.basic_publish(exchange='',
                      routing_key='code_queue',
                      body=body,
                      properties=pika.BasicProperties(
-                         headers={'retry_count': retry_count}
+                         headers={'retryCount': retryCount}
                      ))
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
         return None
-    status, tests = parse_verdict(verdict)
-    if status == None :
-        publish_status(filename, "Retrying : Error in Fetching Status")
-        retry_count = retry_count + 1
-        body = json.dumps(code_data)
+    
+    parsedVerdict = parse_verdict(verdict)
+    if parsedVerdict == None :
+        publish_status(submissionId, "Retrying : Error Fetching Status", False)
+        retryCount = retryCount + 1
+        body = json.dumps(codeData)
         ch.basic_publish(exchange='',
                      routing_key='code_queue',
                      body=body,
                      properties=pika.BasicProperties(
-                         headers={'retry_count': retry_count}
+                         headers={'retryCount': retryCount}
                      ))
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
         return None
     
-    if status == 'AC':
-        message = 'AC'
-    elif status == 'CE':
-        message = 'CE'
-    else :
-        message = f"{status} on Test: {tests+1}"
-    
-    time.sleep(5)
-    publish_status(filename, message)
+    # time.sleep(5)
+    publish_status(submissionId, parsedVerdict, True)
     ch.basic_ack(delivery_tag=method.delivery_tag)
-    print(f'{verdict}')
+    print(f'{parsedVerdict}')
 
 
 # Set up the consumer to listen to the queue
