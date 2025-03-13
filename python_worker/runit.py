@@ -3,8 +3,8 @@ import subprocess
 
 CONTAINER_PROBLEM_DIR='/judge/problem'
 CONTAINER_SOLUTION_DIR='/judge/solution'
-HOST_PROBLEM_DIR='/mnt/f9c1f3d8-0670-4462-b1e2-11df695e40ee/OnlineJudge/The_Judge/problems'
-HOST_SOLUTION_DIR='/mnt/f9c1f3d8-0670-4462-b1e2-11df695e40ee/OnlineJudge/The_Judge/solutions'
+HOST_PROBLEM_DIR='/mnt/f9c1f3d8-0670-4462-b1e2-11df695e40ee/OnlineJudge/the_judge/problems'
+HOST_SOLUTION_DIR='/mnt/f9c1f3d8-0670-4462-b1e2-11df695e40ee/OnlineJudge/the_judge/solutions'
 DOCKER_IMAGE='the-judge'
 
 # return None if error else
