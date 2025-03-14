@@ -1,16 +1,11 @@
-import express, { Request, Response } from 'express';
-import multer from 'multer';
+import express from 'express';
 import amqplib from 'amqplib';
 import { WebSocketServer, WebSocket } from 'ws';
-
-// Set up storage for file uploads (temporary storage on the local server)
-const storage = multer.memoryStorage();  // Files stored in memory
-const upload = multer({ storage });
 
 // Create an express app
 // Set up WebSocket server
 const app = express();
-const port = 3000;
+const port = 4000;
 
 // Start the server and connect to RabbitMQ
 const server = app.listen(port, async () => {
@@ -55,45 +50,6 @@ async function connectRabbitMQ() {
         }
     }, {noAck : true});
 }
-
-// Endpoint to handle file uploads
-app.post('/submit_solution', upload.single('file'), async (req: any, res: any) => {
-    try {
-        if (!req.file && !req.body.code) {
-            return res.status(400).json({ error: 'No file or code provided' });
-        }
-
-        // Extract code from file or text input
-        const code = req.file ? req.file.buffer.toString() : req.body.code;
-        const language = req.body.language || 'cpp';
-        const problemId = req.body.problemId;
-        const submissionId = req.body.submissionId;
-
-        // Push the code to RabbitMQ queue
-        const codeData = {
-            submissionId,
-            problemId,
-            language,
-            code
-        };
-        const options = {
-            headers: {
-                retryCount: 0,
-            }
-        };
-        const queue = 'code_queue';
-        channel.sendToQueue(queue, Buffer.from(JSON.stringify(codeData)), options);
-
-        // console.log(`Code pushed to queue: ${JSON.stringify(codeData)}`);
-
-        // Send response to the user
-        res.json({ message: 'Solution submitted successfully' });
-
-    } catch (error) {
-        console.error('Error submitting solution:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
 
 
 // Websocket Logic
