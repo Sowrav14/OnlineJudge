@@ -29,7 +29,7 @@ def run_code_in_docker(problem_id, solution_dir, submissionId):
         docker_command = [
             "docker", "run", "--rm", "--network", "judge",
             "-e", f"submissionId={submissionId}",
-            "-e", f"TZ=$(cat /etc/timezone)",
+            "-e", f"TZ=Asia/Dhaka",
             "-v", f"{problem_dir}:{CONTAINER_PROBLEM_DIR}",
             "-v", f"{solution_dir}:{CONTAINER_SOLUTION_DIR}",
             DOCKER_IMAGE

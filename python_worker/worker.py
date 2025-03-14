@@ -52,6 +52,7 @@ def callback(ch, method, properties, body):
     problemId = codeData['problemId']
     language = codeData['language']
     code = codeData['code']
+    print(f"Received Submission : ",codeData)
 
     # print(f"Retry : {retryCount} of 3")
     if retryCount >= 2 :
@@ -61,13 +62,13 @@ def callback(ch, method, properties, body):
         return
 
 
-    print(f"Received Submission : {codeData['submissionId']}")
     publish_status(submissionId, "Received", False)
     time.sleep(2)
     publish_status(submissionId, "Processing", False)
     time.sleep(2)
 
     solution_dir = save_code_locally(code=code, submissionId=submissionId, language=language)
+    print("Submission is saved locally : ", solution_dir)
     if(solution_dir == None) :
         publish_status(submissionId, "Retrying : Error Saving", False)
         retryCount = retryCount + 1
@@ -84,7 +85,7 @@ def callback(ch, method, properties, body):
     
     publish_status(submissionId, "Submitted", False)
     time.sleep(2)
-
+    print("Submission is processing in docker container ")
     verdict = run_code_in_docker(problemId, solution_dir, submissionId)
     if(verdict == None) :
         publish_status(submissionId, "Retrying : Error Running", False)
@@ -99,6 +100,7 @@ def callback(ch, method, properties, body):
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
         return None
     
+    print("Verdict received : ", verdict)
     parsedVerdict = parse_verdict(verdict)
     if parsedVerdict == None :
         publish_status(submissionId, "Retrying : Error Fetching Status", False)
