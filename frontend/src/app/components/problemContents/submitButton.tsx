@@ -1,5 +1,6 @@
 'use client'
 
+import axios from 'axios'
 import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
@@ -23,22 +24,49 @@ const submissionData : Partial<ISubmissionDetails> = {
 };
 
 
-export default function SubmitButton() {
+export default function SubmitButton({problemId} : {problemId : number}) {
   	const [loading, setLoading] = useState<boolean>(false);
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const { code, file, language } = useCode();
+	const [sId, setsId] = useState<string | null>(null);
 
-	const handleClick = ()=> {
+	const handleClick = async ()=> {
 		setLoading(true);
-		// update in db
-		// queue
-		setTimeout(() => {
-			console.log(code);
-			console.log(file);
-			console.log(language);
+		try{
+			// Prepare the body
+			const formData = new FormData();
+			formData.append('code', code);
+			formData.append('language', language);
+			formData.append('problemId', problemId.toString());
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+			// send the code to database and get the submissionId
+			const response = await axios.post('/api/submit', formData,{
+				headers : {
+					'Content-Type' : 'multipart/form-data'
+				}
+			})
+			// get the submissionId
+			if(response.data){
+				const data = await response.data;
+				const subId = data.submissionId;
+				if(data.success){
+					setsId(subId);
+					setIsOpen(true);
+					setLoading(false);
+					// by this submission id put the code in queue..
+					formData.append('submissionId', subId);
+					await axios.put('/api/submit', formData, {
+						headers : {
+							'Content-Type' : 'multipart/form-data'
+						}
+					})
+				}
+			}
+		} catch (e) {
+			console.log("error", e);
+		} finally{
 			setLoading(false);
-			setIsOpen(true);
-		}, 1000);
+		}
 	}
 
 
@@ -50,14 +78,14 @@ export default function SubmitButton() {
 				{loading && <Loader2 className="animate-spin" />}
 				Submit
 			</Button>
-			<Drawer open={isOpen} onOpenChange={setIsOpen}>
+			<Drawer open={isOpen && sId != null} onOpenChange={setIsOpen}>
 				<DrawerContent>
 					<div className="p-4 flex gap-4 w-full h-[80vh]">
 						<div className=" w-1/3 h-full flex flex-col justify-center items-center">
 							<DrawerTitle>
 								<p className="text-2xl text-center"> {submissionData.problemName} </p>
 							</DrawerTitle>
-							<CodeStatus sId={'1'}/>
+							{sId != null && <CodeStatus sId={sId}/>}
 							<DrawerClose asChild >
 								<p className="text-center text-md"> Every great achievement begins with the courage to try. Keep coding, and let your solutions speak louder than words! </p>
 							</DrawerClose>

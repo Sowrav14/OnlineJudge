@@ -1,20 +1,21 @@
 import { ISubmissionDetails } from '@/lib/types';
 import React from 'react';
 import ParseStatus from './statusParsing';
+import { getCurrentTime } from '@/lib/utility_functions';
 
 const CodeStatus = ({sId} : {sId : string}) => {
 
   // fetch the status by sId
   const submissionDetails : Partial<ISubmissionDetails> = {
-    submissionId: '12345',
+    submissionId: sId,
     problemName: 'Having Been a Treasurer in the Past. I Help Goblins Deceive',
-    author: 'John Doe',
-    submittedAt: '2025-03-11 12:30:00',
+    author: 'Sowrav Nath',
+    submittedAt: getCurrentTime(),
     language: 'C++',
   }
 
   return (
-    <div className="border rounded-lg shadow-md p-4 w-2/3 m-2">
+    <div className="border rounded-lg shadow-md p-4 w-3/4 m-2">
       <div className="space-y-2">
         <div className="flex justify-between">
           <span className="font-semibold">Submission ID:</span>

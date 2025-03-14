@@ -34,7 +34,7 @@ const Problem = async ({params} : {params : Promise<{problemId : string}>}) => {
 				</div>
 				<Uploadcode/>
 				<div className="flex w-full justify-center">
-					<SubmitButton/>
+					<SubmitButton problemId={id}/>
 				</div>
 			</div>
 		</div>
