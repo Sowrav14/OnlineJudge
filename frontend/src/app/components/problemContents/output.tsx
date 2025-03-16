@@ -1,10 +1,8 @@
-import { Problems } from "@/lib/problems";
-import { notFound } from "next/navigation";
+import { IProblem } from "@/lib/types";
 
 
-const Output = ({id}:{id:number}) => {
-	const problem = Problems.find((p) => p.id === id);
-		if(!problem) return notFound();
+
+const Output = ({problem}:{problem:IProblem}) => {
 	
 	return(
 		<div>

@@ -1,11 +1,11 @@
 // File: /app/api/submit_solution/route.ts
+import { prisma } from '@/lib/prisma';
 import { connectRabbitMQ } from '@/lib/rabbitmq';
-import { generateShortUUID, getCurrentTime } from '@/lib/utility_functions';
 import { NextRequest, NextResponse } from 'next/server';
 
 
 
-// API route handler for code submission
+// API route handler for code submission in queue
 export async function PUT(request: NextRequest) {
   try {
     // Ensure RabbitMQ is connected
@@ -24,7 +24,7 @@ export async function PUT(request: NextRequest) {
         submissionId : submissionId,
         status : 'Failed',
         isFinal : true,
-        time : getCurrentTime()
+        time : Date.now(),
       }
       ch.publish('submission-status', '', Buffer.from(JSON.stringify(message)));
       return NextResponse.json(
@@ -45,18 +45,15 @@ export async function PUT(request: NextRequest) {
         retryCount: 0,
       }
     };
-
     const message = {
         submissionId : submissionId,
         status : 'Queued',
         isFinal : false,
-        time : getCurrentTime()
+        time : Date.now(),
     }
     
     ch.publish('submission-status', '', Buffer.from(JSON.stringify(message)));
-    await new Promise((resolve) => setTimeout(resolve, 5000));
     ch.sendToQueue('code_queue', Buffer.from(JSON.stringify(codeData)), options);
-
     return NextResponse.json({ 
       success : true,
       submissionId : submissionId  
@@ -67,11 +64,22 @@ export async function PUT(request: NextRequest) {
   }
 }
 
+// API route for code submission in database
 export async function POST(request:NextRequest) {
+  // const userId = request.headers.get('userId') as string;
+  const userId = 'u3'
+  if(!userId){
+    return NextResponse.json(
+      {error : "Unauthorized"},
+      {status : 401 }
+    )
+  }
+
   const formData = await request.formData();
+  const problemId = formData.get('problemId') as string | null;
   const code = formData.get('code') as string | null;
   const language = formData.get('language') as string | null;
-  const problemId = formData.get('problemId') as string | null;
+
 
   // Validate input
   if (!code || !language || !problemId) {
@@ -81,11 +89,26 @@ export async function POST(request:NextRequest) {
     );
   }
 
-  // Get it from database
-  const submissionId = generateShortUUID();
+  const submission = await prisma.submission.create({
+    data : {problemId, userId, code, language}
+  });
+  
+  const problem = await prisma.problem.findUnique({
+    where : { id : problemId },
+    select : { title : true },
+  });
 
+  const user = await prisma.user.findUnique({
+    where : { id : userId },
+    select : { name : true }
+  })
+
+  const problemName = problem?.title;
+  const userName = user?.name;
   return NextResponse.json({ 
     success : true,
-    submissionId : submissionId  
+    submission : submission,
+    problemName : problemName,
+    userName : userName
   });
 }

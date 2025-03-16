@@ -1,34 +1,30 @@
 'use client'
-import { Problems } from "@/lib/problems";
 import React, { useState } from "react";
 import { Clipboard, ClipboardCheck } from "lucide-react";
-import { notFound } from "next/navigation";
-import { Separator } from "@/components/ui/separator";
+import { IProblem } from "@/lib/types";
 
 const Parserhtml = ({ content } : {content : string}) => {
-  // Replace newlines with <br />
-  const formattedStatement = content.replace(/\n/g, "<br/>");
-  return (
-    <div
-      dangerouslySetInnerHTML={{ __html: formattedStatement }}
-    />
-  );
+	// Replace newlines with <br />
+	const formattedStatement = content.replace(/\n/g, "<br/>");
+	return (
+		<div
+			dangerouslySetInnerHTML={{ __html: formattedStatement }}
+		/>
+	);
 };
 
 
-const Sample = ({id}:{id:number}) => {
-	const problem = Problems.find((p) => p.id === id);
-	if(!problem) return notFound();
+const Sample = ({problem}:{problem:IProblem}) => {
 	
 	const input = problem.sampleInput;
-  const output = problem.sampleOutput;
-  const [copied, setCopied] = useState({ input: false, output: false });
+	const output = problem.sampleOutput;
+	const [copied, setCopied] = useState({ input: false, output: false });
 
-  const handleCopy = (text: string, type: "input" | "output") => {
-    navigator.clipboard.writeText(text);
-    setCopied({ ...copied, [type]: true });
-    setTimeout(() => setCopied({ ...copied, [type]: false }), 1000);
-  };
+	const handleCopy = (text: string, type: "input" | "output") => {
+		navigator.clipboard.writeText(text);
+		setCopied({ ...copied, [type]: true });
+		setTimeout(() => setCopied({ ...copied, [type]: false }), 1000);
+	};
 
   return (
 		<div>

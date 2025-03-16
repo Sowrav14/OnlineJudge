@@ -1,13 +1,11 @@
 'use client'
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { formatDistanceToNow } from 'date-fns'
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
-import { Dot } from "lucide-react"
-import { motion } from 'framer-motion'
 
 interface statusVerdict {
 	verdict : string,

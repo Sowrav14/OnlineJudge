@@ -6,6 +6,7 @@ import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 import { Separator } from "@/components/ui/separator";
 import { CodeProvider } from "./context/codeContext";
+import { Toaster } from "@/components/ui/sonner";
 
 
 
@@ -37,6 +38,7 @@ export default function RootLayout({
             <Navbar/>
             <Separator/>
             {children}
+            <Toaster/>
             <Separator/>
             <Footer/>
           </CodeProvider>

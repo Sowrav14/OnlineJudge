@@ -1,5 +1,4 @@
-import { Problems } from "@/lib/problems";
-import { notFound } from "next/navigation";
+import { IProblem } from "@/lib/types";
 
 const Parserhtml = ({ content } : {content : string}) => {
   // Replace newlines with <br />
@@ -11,9 +10,7 @@ const Parserhtml = ({ content } : {content : string}) => {
   );
 };
 
-const Constrains = ({id}:{id:number}) => {
-	const problem = Problems.find((p) => p.id === id);
-		if(!problem) return notFound();
+const Constrains = ({problem}:{problem:IProblem}) => {
 	
 	return(
 		<div>

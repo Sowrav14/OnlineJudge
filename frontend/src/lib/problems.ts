@@ -2,7 +2,7 @@ import { IProblem } from "./types";
 
 export const Problems : IProblem[] = [
 	{
-		id: 1,
+		id: '1',
 		title: "Let's Get The Sum",
 		author: "Sowrav Nath",
 		tag: "bruteforce",
@@ -16,7 +16,7 @@ export const Problems : IProblem[] = [
 		memory: 128
 	},
 	{ 
-		id: 2, 
+		id: '2', 
 		title: "Strong Connectivity Strikes Back",
 		author: "Sowrav Nath",
 		tag: 'bruteforce', 
@@ -30,7 +30,7 @@ export const Problems : IProblem[] = [
 		memory: 128
 	},
 	{ 
-		id: 3, 
+		id: '3', 
 		title: "Alice, Bob and Two Arrays", 
 		author: "Sowrav Nath",
 		tag: 'bruteforce', 
@@ -44,7 +44,7 @@ export const Problems : IProblem[] = [
 		memory: 128 
 	},
 	{ 
-		id: 4, 
+		id: '4', 
 		title: "Another Folding Strip", 
 		author: "Sowrav Nath",
 		tag: 'bruteforce', 
@@ -58,7 +58,7 @@ export const Problems : IProblem[] = [
 		memory: 128
 	},
 	{ 
-		id: 5, 
+		id: '5', 
 		title: "Binary Sequence Value Sum", 
 		author: "Sowrav Nath",
 		tag: 'bruteforce',  
@@ -72,7 +72,7 @@ export const Problems : IProblem[] = [
 		memory: 128
 	},
 	{ 
-		id: 6, 
+		id: '6', 
 		title: "Secret Lilies and Roses", 
 		author: "Sowrav Nath",
 		tag: 'bruteforce',
@@ -86,7 +86,7 @@ export const Problems : IProblem[] = [
 		memory: 128
 	},
 	{ 
-		id: 7, 
+		id: '7', 
 		title: "Three Dimensional Embedding", 
 		author: "Sowrav Nath",
 		tag: 'bruteforce', 
@@ -100,7 +100,7 @@ export const Problems : IProblem[] = [
 		memory: 128
 	},
 	{ 
-		id: 8, 
+		id: '8', 
 		title: "Control Towers", 
 		author: "Sowrav Nath",
 		tag: 'bruteforce',  
@@ -114,7 +114,7 @@ export const Problems : IProblem[] = [
 		memory: 128
 	},
 	{ 
-		id: 9, 
+		id: '9', 
 		title: "LeaFall", 
 		author: "Sowrav Nath",
 		tag: 'bruteforce', 
@@ -128,7 +128,7 @@ export const Problems : IProblem[] = [
 		memory: 128
 	},
 	{ 
-		id: 10, 
+		id: '10', 
 		title: "Having Been a Treasurer in the Past. I Help Goblins Deceive", 
 		author: "Sowrav Nath",
 		tag: 'bruteforce', 

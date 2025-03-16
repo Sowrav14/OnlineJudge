@@ -1,50 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ColumnDef,
   useReactTable,
   getCoreRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import { ISubmissionDetails } from "@/lib/types";
+import { ISubmission } from "@/lib/types";
+import dayjs from "dayjs";
+import axios from "axios";
 
-// Sample data
-const submissions: Partial<ISubmissionDetails>[] = [
-  {
-    submissionId: "123456",
-    language: "C++",
-    submittedAt: "2025-03-12 14:30",
-    verdict: "Accepted",
-    passedTest: 10,
-    totalTest: 10,
-    time: 1.2,
-    memory: 256,
-  },
-  {
-    submissionId: "123457",
-    language: "Python",
-    submittedAt: "2025-03-12 14:35",
-    verdict: "Wrong Answer",
-    passedTest: 7,
-    totalTest: 10,
-    time: 1.8,
-    memory: 300,
-  },
-  {
-    submissionId: "123458",
-    language: "Java",
-    submittedAt: "2025-03-12 14:40",
-    verdict: "Time Limit Exceeded",
-    passedTest: 5,
-    totalTest: 10,
-    time: 5.0,
-    memory: 512,
-  },
-];
 
 // Define table columns
-const columns: ColumnDef<Partial<ISubmissionDetails>>[] = [
+const columns: ColumnDef<Partial<ISubmission>>[] = [
   {
     accessorKey: "submissionId",
     header: "Submission ID",
@@ -56,6 +25,18 @@ const columns: ColumnDef<Partial<ISubmissionDetails>>[] = [
   {
     accessorKey: "submittedAt",
     header: "Submitted At",
+    cell : ({row}) => {
+      const curtime = row.getValue('submittedAt') as Date;
+      const [formattedDate, setFormattedDate] = useState<string | null>(null);
+
+      useEffect(()=>{
+        setFormattedDate(dayjs(curtime).format("YYYY-MM-DD HH:mm:ss"));
+      }, [curtime]);
+
+      if(!formattedDate) return <span> loading... </span>
+
+      return <span> {formattedDate} </span>
+    }
   },
   {
     accessorKey: "verdict",
@@ -67,6 +48,10 @@ const columns: ColumnDef<Partial<ISubmissionDetails>>[] = [
       if (verdict === "Accepted") color = "text-green-500";
       else if (verdict === "Wrong Answer") color = "text-red-500";
       else if (verdict === "Time Limit Exceeded") color = "text-yellow-500";
+      else if (verdict === "Memory Limit Exceeded") color = "text-purple-500";
+      else if (verdict === "Compilation Error") color = "text-pink-500";
+      else if (verdict === "Runtime Error") color = "text-orange-500";
+      else if (verdict === "Failed") color = "text-red-900";
 
       return <span className={`${color} font-semibold`}>{verdict}</span>;
     },
@@ -93,18 +78,49 @@ const columns: ColumnDef<Partial<ISubmissionDetails>>[] = [
   },
 ];
 
-const SubmissionTable: React.FC = () => {
+const SubmissionTable  = ({problemId} : {problemId:string}) => {
+  const [submissions, setSubmissions] = useState<Partial<ISubmission>[]>([]);
   const table = useReactTable({
     data: submissions,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
+  useEffect(()=>{
+    const fetchSubmissions = async() => {
+      try {
+        const res = await axios.get(`http://localhost:3000/api/submissions/${problemId}`);
+        const subs : ISubmission[] = res.data.submissions;
+        const newsubs : Partial<ISubmission>[] = subs.map(({
+          submissionId,
+          language,
+          submittedAt,
+          verdict,
+          passedTest,
+          totalTest,
+          time,
+          memory
+        }) => ({
+          submissionId,
+          language,
+          submittedAt,
+          verdict,
+          passedTest,
+          totalTest,
+          time,
+          memory
+        }));
+
+        setSubmissions((_)=>[...newsubs]);
+      } catch(e){
+        console.log("error", e);
+      }
+    }
+    fetchSubmissions();
+  }, [problemId]);
+
   return (
     <div className="p-4 mt-8 bg-white dark:bg-gray-900 rounded-md shadow-md">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-        Submission History
-      </h2>
       <div className="overflow-x-auto">
         <table className="w-full border border-gray-300 dark:border-gray-700">
           <thead>

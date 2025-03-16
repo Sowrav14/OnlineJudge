@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String                @id @default(uuid())
+  name                 String
+  email                String                @unique
+  password             String
+  submissions          Submission[]
+}
+
+model Problem{
+  id                   String                @id @default(uuid())
+	title                String
+	author               String
+	tag                  String
+	statement            String
+	input                String
+	output               String
+	constrains           String
+	sampleInput          String
+	sampleOutput         String	
+  time                 Float
+	memory               Int
+  submissons           Submission[]
+}
+
+model Submission{
+  submissionId         String                 @id @default(uuid())
+	problem              Problem                @relation(fields: [problemId], references: [id])
+	problemId            String
+  user                 User                   @relation(fields: [userId], references: [id])
+  userId               String                 
+  submittedAt          DateTime               @default(now())
+  code                 String
+  language             String
+  verdict              String                 @default("Error")
+	totalTest            Int                    @default(0)
+	passedTest           Int                    @default(0)
+  time                 Float                  @default(0.0)
+  memory               Int                    @default(0)
+
+  @@index([verdict])    // Speed up filtering by verdict...
+}

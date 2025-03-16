@@ -1,11 +1,10 @@
 import { Problems } from "@/lib/problems";
+import { IProblem } from "@/lib/types";
 import { notFound } from "next/navigation";
 
 
 
-const Title = ({id}:{id:number}) => {
-	const problem = Problems.find((p) => p.id === id);
-	if(!problem) return notFound();
+const Title = ({problem}:{problem:IProblem}) => {
 
 	return(
 		<div className="flex flex-col text-center w-full">

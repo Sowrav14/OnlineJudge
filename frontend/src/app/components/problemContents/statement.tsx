@@ -1,4 +1,5 @@
 import { Problems } from "@/lib/problems";
+import { IProblem } from "@/lib/types";
 import { notFound } from "next/navigation";
 
 
@@ -12,9 +13,7 @@ const Parserhtml = ({ content } : {content : string}) => {
   );
 };
 
-const Statement = ({id}:{id:number}) => {
-	const problem = Problems.find((p) => p.id === id);
-	if(!problem) return notFound();
+const Statement = ({problem}:{problem:IProblem}) => {
 	
 	return(
 		<div>

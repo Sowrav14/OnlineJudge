@@ -1,5 +1,5 @@
 export  type IProblem = {
-	id : number,
+	id : string,
 	title : string,
 	author : string,
 	tag : string,
@@ -8,22 +8,28 @@ export  type IProblem = {
 	output : string,
 	constrains : string,
 	sampleInput : string,
-	sampleOutput:string,
-	time:number,
-	memory:number
+	sampleOutput: string,
+	time: number,
+	memory: number
 }
 
-export type ISubmissionDetails = {
+export type ISubmission = {
     submissionId: string;
 	userId:string;
 	problemId:string;
-    author: string;
-    problemName: string;
-    submittedAt: string;
+    submittedAt: Date;
+	code : string;
     language: string;
     verdict: string;
 	totalTest : number;
 	passedTest : number;
     time: number;
     memory: number;
+}
+
+export type IUser = {
+	id : string,
+	name : string,
+	email : string,
+	password : string,
 }
