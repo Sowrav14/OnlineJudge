@@ -4,6 +4,7 @@ import time
 import re
 from saveit import save_code_locally
 from runit import run_code_in_docker
+from updateDB import UpdateDatabase
 from datetime import datetime
 
 RABBITMQ_PARAM='localhost'
@@ -115,6 +116,21 @@ def callback(ch, method, properties, body):
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
         return None
     
+    isUpdated = UpdateDatabase(submissionId=submissionId, data=parsedVerdict)
+    if isUpdated == False : 
+        publish_status(submissionId, "Retrying : Error Updating Status", False)
+        retryCount = retryCount + 1
+        body = json.dumps(codeData)
+        ch.basic_publish(exchange='',
+                     routing_key='code_queue',
+                     body=body,
+                     properties=pika.BasicProperties(
+                         headers={'retryCount': retryCount}
+                     ))
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        return None
+
+
     # time.sleep(5)
     publish_status(submissionId, parsedVerdict, True)
     ch.basic_ack(delivery_tag=method.delivery_tag)
