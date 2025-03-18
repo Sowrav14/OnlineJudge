@@ -25,19 +25,14 @@ import {
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button";
 import SubmissionStats from "@/app/components/problemContents/stats";
+import { Getthisproblem } from "@/lib/actions/getproblems";
 
 
 const Problem = async ({params} : {params : Promise<{problemId : string}>}) => {
 	const { problemId } = await params;
 	const id = problemId as string;
-	let problem : IProblem;
-	try{
-		const res = await axios.get(`http://localhost:3000/api/problems/${id}`);
-		problem = res.data.problem;
-	} catch (error){
-		console.log("error", error);
-		return notFound();
-	}
+	const problem : IProblem | null = (await Getthisproblem(problemId)).problem || null
+	if(problem === null) return notFound();
 	
 	return(
 		<div className={`flex gap-2 p-2 w-full h-[87vh]`}>
@@ -49,20 +44,20 @@ const Problem = async ({params} : {params : Promise<{problemId : string}>}) => {
 				<Constrains problem={problem}/>
 				<Sample problem={problem}/>
 				<SubmissionStats problemId={problem.id}/>
-				<div className="flex justify-center items-center">
+				<div>
 					<Sheet>
 						<SheetTrigger asChild>
-							<p className="hover:underline text-xl mt-8 mb-2 font-semibold"> Your Submission History </p>
+							<p className="hover:underline text-xl mt-8 mb-2 font-semibold"> Your Submission History : </p>
 						</SheetTrigger>
-						<SheetContent side="left" className=" !max-w-fit bg-white dark:bg-gray-900 rounded-md shadow-md">
+						<SheetContent side="left" className=" min-w-full !max-w-fit bg-white dark:bg-gray-900 rounded-md shadow-md">
 							<SheetHeader>
 								<SheetTitle className="text-center text-xl font-semibold text-gray-900 dark:text-white mb-4">
-										Your Submission History
+										Submission History
 								</SheetTitle>
-								<SheetDescription> </SheetDescription>
+								<SheetDescription> Problem : {problem.title} </SheetDescription>
 							</SheetHeader>
 							<div className="overflow-y-auto max-h-[calc(100%-6rem)]">
-								<SubmissionTable problemId={'1'}/>
+								<SubmissionTable problemId={problem.id}/>
 							</div>
 							<SheetFooter className="">
 								<SheetClose asChild>

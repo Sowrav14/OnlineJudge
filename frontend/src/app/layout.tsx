@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "./components/theme_provider";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 import { Separator } from "@/components/ui/separator";
-import { CodeProvider } from "./context/codeContext";
 import { Toaster } from "@/components/ui/sonner";
+import { Providers } from "./providers";
 
 
 
@@ -33,16 +32,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange >
-          <CodeProvider>
-            <Navbar/>
-            <Separator/>
-            {children}
-            <Toaster/>
-            <Separator/>
-            <Footer/>
-          </CodeProvider>
-        </ThemeProvider>
+        <Providers>
+          <Navbar/>
+          <Separator/>
+          {children}
+          <Toaster/>
+          <Separator/>
+          <Footer/>
+        </Providers>
       </body>
     </html>
   );

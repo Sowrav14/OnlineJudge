@@ -1,10 +1,18 @@
 import { prisma } from "@/lib/prisma";
 import { IProblem } from "@/lib/types";
 import { NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 
+// Get problem with problemId
 export async function GET(req:NextApiRequest, { params } : {params : {problemId : string}}) {
+    const session = await getServerSession(authOptions);
+    if(!session){
+        return NextResponse.json({error:"unauthorized"}, {status : 401})
+    }
+    
     const {problemId} = await params
     if(!problemId) {
         return NextResponse.json({error:"Invalid route"}, {status : 400});

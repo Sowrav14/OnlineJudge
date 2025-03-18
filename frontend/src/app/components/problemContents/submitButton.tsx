@@ -21,7 +21,7 @@ export default function SubmitButton({problemId} : {problemId : string}) {
   	const [loading, setLoading] = useState<boolean>(false);
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const { code, file, language } = useCode();
-	const [userName, setUserName] = useState<string | null>(null);
+	const [userName, setUserName] = useState<string>('Unknown');
 	const [problemName, setProblemName] = useState<string | null>(null);
 	const [submission, setSubmission] = useState<ISubmission | null>(null)
 
@@ -88,7 +88,7 @@ export default function SubmitButton({problemId} : {problemId : string}) {
 							<DrawerTitle>
 								<p className="text-2xl text-center"> {problemName} </p>
 							</DrawerTitle>
-							{submission != null && userName != null && <CodeStatus submission={submission} author={userName}/>}
+							{submission != null && <CodeStatus submission={submission} author={userName}/>}
 							<DrawerClose asChild >
 								<p className="text-center text-md"> Every great achievement begins with the courage to try. Keep coding, and let your solutions speak louder than words! </p>
 							</DrawerClose>

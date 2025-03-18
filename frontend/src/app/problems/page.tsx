@@ -2,11 +2,11 @@
 import axios from "axios";
 import ProblemCard from "../components/problemCard";
 import { IProblem } from "@/lib/types";
+import { Getproblems } from "@/lib/actions/getproblems";
 
 const Problems = async () => {
-	const res = await axios.get('http://localhost:3000/api/problems');
-	const problems : IProblem[] = await res.data.problems;
-	// console.log(data);
+	const problems : IProblem[] = (await Getproblems()).problems || [];
+	// console.log(problems);
 
 	return(
 		<div className="flex flex-col p-12 w-full m-auto items-center justify-center align-middle text-center">

@@ -6,6 +6,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
+import { getVerdictColor, getVerdictLabel } from "@/lib/utility_functions"
 
 interface statusVerdict {
 	verdict : string,
@@ -26,24 +27,7 @@ interface Message {
 	time : string
 }
 
-const statusMap: Record<string, { label: string; color: string }> = {
-	'AC': { label: "Accepted", color: "text-green-500" },
-	'WA': { label: "Wrong Answer", color: "text-red-500" },
-	'TLE': { label: "Time Limit Exceeded", color: "text-yellow-500" },
-	'MLE': { label: "Memory Limit Exceeded", color: "text-purple-500" },
-	'RE': { label: "Runtime Error", color: "text-orange-500" },
-	'CE': { label: "Compilation Error", color: "text-pink-500" },
-	'Queued': { label: "Queued", color: "text-blue-500" },
-};
 
-function getColor(status : string){
-	const color = statusMap[status]?.color || 'text-cyan-400';
-	return color;
-}
-function getLabel(status:string){
-	const label = statusMap[status]?.label || status;
-	return label;
-}
 
 const ParseStatus = ({sId} : {sId : string}) => {
 	const [verdict, setVerdict] = useState<string>("Queued");
@@ -141,7 +125,7 @@ const ParseStatus = ({sId} : {sId : string}) => {
 				</span>
 				<HoverCard>
 					<HoverCardTrigger asChild>
-						<span className={`hover:underline text-xl ${getColor(verdict)}`}> {getLabel(verdict)} </span>
+						<span className={`hover:underline text-xl ${getVerdictColor(verdict)}`}> {getVerdictLabel(verdict)} </span>
 					</HoverCardTrigger>
 					<HoverCardContent side="right" align="center" className="w-100" sideOffset={20}>
 						<div className=" bg-white dark:bg-gray-900">
@@ -159,11 +143,11 @@ const ParseStatus = ({sId} : {sId : string}) => {
 			</div>
 			<div className="flex justify-between">
 				<span className="font-semibold">Time:</span>
-				<span>{time} Sec</span>
+				<span>{time} ms</span>
 			</div>
 			<div className="flex justify-between">
 				<span className="font-semibold">Memory:</span>
-				<span>{memory} MB</span>
+				<span>{memory} KB</span>
 			</div>
 		</>
 	)

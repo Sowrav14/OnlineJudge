@@ -1,6 +1,12 @@
 'use client'
+import { LoginForm } from "@/components/login-form";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
+import { DialogContent, DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import LoginDialog from "./components/authdialog";
 
 export default function HeroSection() {
   const [text, setText] = useState("");
@@ -40,6 +46,9 @@ export default function HeroSection() {
         <span className="text-[#df3434]">{judgeIndex !== -1 ? "Judge" : ""}</span>
         {after}
       </motion.h1>
+
+      <Link href={'/test'}> continue </Link>
+      <LoginDialog/>
     </div>
   );
 }

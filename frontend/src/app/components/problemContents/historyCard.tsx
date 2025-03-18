@@ -10,6 +10,7 @@ import {
 import { ISubmission } from "@/lib/types";
 import dayjs from "dayjs";
 import axios from "axios";
+import { getVerdictColor, getVerdictLabel } from "@/lib/utility_functions";
 
 
 // Define table columns
@@ -43,17 +44,10 @@ const columns: ColumnDef<Partial<ISubmission>>[] = [
     header: "Verdict",
     cell: ({ row }) => {
       const verdict = row.getValue("verdict") as string;
-      let color = "text-gray-700";
+      let color = getVerdictColor(verdict);
+      let label = getVerdictLabel(verdict);
 
-      if (verdict === "Accepted") color = "text-green-500";
-      else if (verdict === "Wrong Answer") color = "text-red-500";
-      else if (verdict === "Time Limit Exceeded") color = "text-yellow-500";
-      else if (verdict === "Memory Limit Exceeded") color = "text-purple-500";
-      else if (verdict === "Compilation Error") color = "text-pink-500";
-      else if (verdict === "Runtime Error") color = "text-orange-500";
-      else if (verdict === "Failed") color = "text-red-900";
-
-      return <span className={`${color} font-semibold`}>{verdict}</span>;
+      return <span className={`${color} font-semibold`}>{label}</span>;
     },
   },
   {
@@ -70,23 +64,27 @@ const columns: ColumnDef<Partial<ISubmission>>[] = [
   },
   {
     accessorKey: "time",
-    header: "Time",
+    header: "Time(MS)",
   },
   {
     accessorKey: "memory",
-    header: "Memory",
+    header: "Memory(KB)",
   },
 ];
 
 const SubmissionTable  = ({problemId} : {problemId:string}) => {
   const [submissions, setSubmissions] = useState<Partial<ISubmission>[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const table = useReactTable({
     data: submissions,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
+  // if(submissions.length == 0 && loading == false) return <p className="m-12 p-12"> No Submission </p>
+
   useEffect(()=>{
+    setLoading(true);
     const fetchSubmissions = async() => {
       try {
         const res = await axios.get(`http://localhost:3000/api/submissions/${problemId}`);
@@ -117,6 +115,7 @@ const SubmissionTable  = ({problemId} : {problemId:string}) => {
       }
     }
     fetchSubmissions();
+    setLoading(false);
   }, [problemId]);
 
   return (

@@ -9,9 +9,31 @@ async function main() {
   // 🌟 Create Users
   const users = await prisma.user.createMany({
     data: [
-      { id: "u1", name: "Alice", email: "alice@example.com", password: "password123" },
-      { id: "u2", name: "Bob", email: "bob@example.com", password: "password456" },
-      { id: "u3", name: "Charlie", email: "charlie@example.com", password: "password789" }
+        { 
+            id: "u1", 
+            name: "Alice", 
+            email: "alice@example.com", 
+            password: "password123",
+            provider : "manual",
+            image : 'https://res.cloudinary.com/dzu1eahgi/image/upload/v1742206423/userAvatar.png',
+
+        },
+        { 
+            id: "u2", 
+            name: "Bob", 
+            email: "bob@example.com", 
+            password: "password456",
+            provider : "manual",
+            image : 'https://res.cloudinary.com/dzu1eahgi/image/upload/v1742206423/userAvatar.png',
+        },
+        { 
+            id: "u3", 
+            name: "Charlie", 
+            email: "charlie@example.com", 
+            password: "password789",
+            provider : "manual",
+            image : 'https://res.cloudinary.com/dzu1eahgi/image/upload/v1742206423/userAvatar.png',
+        }
     ],
     skipDuplicates: true
   });

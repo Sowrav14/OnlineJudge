@@ -1,12 +1,18 @@
 // File: /app/api/submit_solution/route.ts
 import { prisma } from '@/lib/prisma';
 import { connectRabbitMQ } from '@/lib/rabbitmq';
+import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
+import { authOptions } from '../auth/[...nextauth]/route';
 
 
 
 // API route handler for code submission in queue
 export async function PUT(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if(!session){
+      return NextResponse.json({error:"unauthorized"}, {status : 401})
+  }
   try {
     // Ensure RabbitMQ is connected
     const ch = await connectRabbitMQ();
@@ -53,6 +59,7 @@ export async function PUT(request: NextRequest) {
     }
     
     ch.publish('submission-status', '', Buffer.from(JSON.stringify(message)));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     ch.sendToQueue('code_queue', Buffer.from(JSON.stringify(codeData)), options);
     return NextResponse.json({ 
       success : true,
@@ -66,8 +73,12 @@ export async function PUT(request: NextRequest) {
 
 // API route for code submission in database
 export async function POST(request:NextRequest) {
+  const session = await getServerSession(authOptions);
+  if(!session){
+      return NextResponse.json({error:"unauthorized"}, {status : 401})
+  }
   // const userId = request.headers.get('userId') as string;
-  const userId = 'u3'
+  const userId = session.user.id;
   if(!userId){
     return NextResponse.json(
       {error : "Unauthorized"},
