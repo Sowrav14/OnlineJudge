@@ -1,7 +1,7 @@
 import { connect } from 'amqplib';
 
 // RabbitMQ connection configuration
-const amqpUrl = 'amqp://localhost';
+const amqpUrl = process.env.RABBITMQ!
 let channel: any = null;
 
 // Initialize RabbitMQ connection

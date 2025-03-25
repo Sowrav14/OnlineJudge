@@ -1,25 +1,27 @@
-# Use Python base image
-FROM python:3.10
+FROM docker:24-dind
 
-# Install required dependencies
-# RUN apt-get update && apt-get install -y docker.io && rm -rf /var/lib/apt/lists/*
-# No Need docker.io i will use mounting docker socket.
+# Install dependencies, Python 3, and tzdata (if you need timezone setup)
+RUN apk add --no-cache python3 py3-pip tzdata
+
+# Set the timezone to Asia/Dhaka
+RUN ln -sf /usr/share/zoneinfo/Asia/Dhaka /etc/localtime && \
+    echo "Asia/Dhaka" > /etc/timezone
+
+# Create a virtual environment and install dependencies inside the virtual environment
+RUN python3 -m venv /venv && \
+    /venv/bin/pip install pika psycopg2-binary
+
+# Set environment variables for virtual environment
+ENV PATH="/venv/bin:$PATH"
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /worker
 
-# install requirements
-RUN pip install --no-cache-dir pika
+# Copy your worker scripts
+COPY worker.py saveit.py runit.py updateDB.py deleteit.py ./
 
-# Copy the worker script
-COPY worker.py .
-COPY saveit.py .
-COPY runit.py .
+# Set execution permissions for all Python scripts
+RUN chmod +x *.py
 
-# Set execution permissions
-RUN chmod +x worker.py
-RUN chmod +x runit.py
-RUN chmod +x saveit.py
-
-# Start the worker script
+# Run the worker script as the entry point
 CMD ["python3", "-u", "worker.py"]

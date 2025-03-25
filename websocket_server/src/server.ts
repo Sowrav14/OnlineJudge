@@ -11,7 +11,11 @@ const port = process.env.PORT;
 // Start the server and connect to RabbitMQ
 const server = app.listen(port, async () => {
     await connectRabbitMQ();
-    console.log(`Get a Web Socket connection on  ws://localhost:${port}?id=x`);
+    console.log(`Get a Web Socket connection on  ws://container-name:${port}?id=x`);
+});
+
+app.get('/', (req : any, res : any) => {
+    return res.send('I am working');
 });
 
 
@@ -20,7 +24,7 @@ const clients: Record<string, WebSocket> = {};
 
 
 // Set up the RabbitMQ connection and channel
-const amqpUrl = 'amqp://localhost';
+const amqpUrl = process.env.RABBITMQ!;
 let channel: amqplib.Channel;
 
 /*

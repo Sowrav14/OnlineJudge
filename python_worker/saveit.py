@@ -1,6 +1,8 @@
 import os
 CONTAINER_PROBLEM_DIR='/judge/problem'
 CONTAINER_SOLUTION_DIR='/judge/solution'
+WORKER_PROBLEM_DIR='/worker/problems'
+WORKER_SOLUTION_DIR='/worker/solutions'
 HOST_PROBLEM_DIR='/mnt/f9c1f3d8-0670-4462-b1e2-11df695e40ee/OnlineJudge/the_judge/problems'
 HOST_SOLUTION_DIR='/mnt/f9c1f3d8-0670-4462-b1e2-11df695e40ee/OnlineJudge/the_judge/solutions'
 
@@ -10,7 +12,7 @@ def save_code_locally(code, submissionId, language):
     Save the user's code to a local directory.
     """
     try :
-        solution_dir = os.path.join(HOST_SOLUTION_DIR, f"solution_{submissionId}")
+        solution_dir = os.path.join(WORKER_SOLUTION_DIR, f"solution_{submissionId}")
         
         # Create directory for the user if it doesn't exist
         if not os.path.exists(solution_dir):

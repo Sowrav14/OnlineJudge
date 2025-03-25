@@ -45,7 +45,8 @@ const ParseStatus = ({sId} : {sId : string}) => {
 	useEffect(() => {
 		if(!sId) return;
 
-		const wsUrl = `ws://localhost:3333?id=${sId}`;
+		const wsUrl = `ws://localhost:8080/?id=${sId}`;
+		console.log("connecting to socker ", wsUrl);
 		const connectWebSocket = () => {
 			try{
 				const socket = new WebSocket(wsUrl);

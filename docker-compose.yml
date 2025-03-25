@@ -1,0 +1,89 @@
+version: "3.7"
+
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    networks:
+      - judge
+    ports:
+      - "5672:5672"  # RabbitMQ AMQP protocol
+      - "15672:15672"  # RabbitMQ management plugin (Web UI)
+    restart: always
+
+  pgdb:
+    image: postgres:latest
+    container_name: pgdb
+    networks:
+      - judge
+    environment:
+      POSTGRES_USER: sowrav
+      POSTGRES_PASSWORD: sowravnath
+      POSTGRES_DB: pgdb
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "sowrav"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 5s
+  
+  python-worker:
+    build: ./python_worker
+    container_name: my-worker
+    networks:
+      - judge
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - problems:/worker/problems:ro
+      - solutions:/worker/solutions
+    depends_on:
+      - rabbitmq
+      - pgdb
+    restart: on-failure:5
+
+  websocket-server:
+    build: ./websocket_server
+    container_name: socketserver
+    networks:
+      - judge
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbitmq
+      - python-worker
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    networks:
+      - judge
+    ports:
+      - "3000:3000"  # Main frontend
+      - "5555:5555"  # For your other port
+    depends_on:
+      - rabbitmq
+      - pgdb
+      - websocket-server
+      - python-worker
+    restart: always
+
+networks:
+  judge:
+    driver: bridge
+
+volumes:
+  pg_data:
+    external: true
+    name: pg_data
+  problems:
+    external: true
+    name: problems
+  solutions:
+    external: true
+    name: problems

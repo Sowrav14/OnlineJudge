@@ -1,7 +1,7 @@
 import psycopg2
 
 # Database connection details
-hostname = 'localhost'
+hostname = 'pgdb'
 database = 'pgdb'
 username = 'sowrav'
 password = 'sowravnath'

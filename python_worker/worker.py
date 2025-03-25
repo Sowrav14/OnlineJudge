@@ -5,9 +5,10 @@ import re
 from saveit import save_code_locally
 from runit import run_code_in_docker
 from updateDB import UpdateDatabase
+from deleteit import delete_code_directory
 from datetime import datetime
 
-RABBITMQ_PARAM='localhost'
+RABBITMQ_PARAM='rabbitmq'
 
 
 # Establish a connection to RabbitMQ
@@ -134,6 +135,9 @@ def callback(ch, method, properties, body):
     # time.sleep(5)
     publish_status(submissionId, parsedVerdict, True)
     ch.basic_ack(delivery_tag=method.delivery_tag)
+    
+    # Delete the directory where the code is stored
+    delete_code_directory(submissionId)
     print(f'{parsedVerdict}')
 
 
