@@ -21,16 +21,10 @@ services:
       POSTGRES_PASSWORD: sowravnath
       POSTGRES_DB: pgdb
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pg-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     restart: always
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "sowrav"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 5s
   
   python-worker:
     build: ./python_worker
@@ -44,11 +38,13 @@ services:
     depends_on:
       - rabbitmq
       - pgdb
-    restart: on-failure:5
+    restart: always
 
   websocket-server:
     build: ./websocket_server
     container_name: socketserver
+    env_file:
+      - ./websocket_server/.env
     networks:
       - judge
     ports:
@@ -61,6 +57,8 @@ services:
   frontend:
     build: ./frontend
     container_name: frontend
+    env_file:
+      - ./frontend/.env
     networks:
       - judge
     ports:
@@ -75,15 +73,16 @@ services:
 
 networks:
   judge:
+    external: true
     driver: bridge
 
 volumes:
-  pg_data:
+  pg-data:
     external: true
-    name: pg_data
+    name: pg-data
   problems:
     external: true
     name: problems
   solutions:
     external: true
-    name: problems
+    name: solutions
