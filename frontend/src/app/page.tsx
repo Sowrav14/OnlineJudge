@@ -11,7 +11,7 @@ import LoginDialog from "./components/authdialog";
 export default function HeroSection() {
   const [text, setText] = useState("");
   const fullText = "Welcome to OnlineJudge ...";
-  const speed = 200; // Typing speed in ms
+  const speed = 100; // Typing speed in ms
 
   useEffect(() => {
     let i = 0;
@@ -26,7 +26,6 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
-  // Ensure "Blog" is found before slicing
   const onlineIndex = text.indexOf("Online");
   const judgeIndex = text.indexOf("Judge")
   const before = onlineIndex !== -1 ? text.slice(0, onlineIndex) : text;
@@ -39,7 +38,7 @@ export default function HeroSection() {
         className="text-7xl font-bold"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 2 }}
       >
         {before}
         <span className="text-[#035196]">{onlineIndex !== -1 ? "Online" : ""}</span>
@@ -47,7 +46,6 @@ export default function HeroSection() {
         {after}
       </motion.h1>
 
-      <Link href={'/test'}> continue </Link>
       <LoginDialog/>
     </div>
   );

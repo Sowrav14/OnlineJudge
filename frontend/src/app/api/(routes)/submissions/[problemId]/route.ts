@@ -17,7 +17,8 @@ export async function GET(req:NextRequest, { params } : {params : {problemId : s
     }
 
     const pid = problemId as string;
-    const uid = session.user.id;
+    //@ts-ignore
+    const uid = session.user?.id;
     
     try {
         const submissions : ISubmission[] = await prisma.submission.findMany({

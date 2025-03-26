@@ -43,7 +43,8 @@ const Navbar = () => {
 			</div>
 			<div className="flex items-center justify-center  gap-6">
 				{!loggedIn && <Link href={'/'} className="hover:text-blue-500 hover:underline"> Home </Link>}
-				<Link href={'/problems'} className="hover:text-blue-500 hover:underline"> Problems </Link>
+				<Link href={'/problems'} className="hover:text-blue-500 hover:underline"> PROBLEMS </Link>
+				<Link href={'/setter'} className="hover:text-blue-500 hover:underline"> SETTER </Link>
 				<ModeToggle/>
 				<TooltipProvider>
 					<Tooltip>
