@@ -61,6 +61,8 @@ services:
       - ./frontend/.env
     networks:
       - judge
+    volumes:
+      - problems:/app/problems
     ports:
       - "3000:3000"  # Main frontend
       - "5555:5555"  # For your other port
