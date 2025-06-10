@@ -39,13 +39,12 @@ My goal was to create a practical yet elegant system to practice and showcase my
 | Code Executor (The Judge) | Docker, bash, python          | Sandboxed multi-language code runner     |
 | Container Orchestration | Docker Compose, docker-in-docker | Environment management                    |
 
----
 
 
 Each technology was carefully selected to deepen my understanding of full-stack development, real-time systems, and containerization. This project allowed me to explore how these tools interact in a production-like environment, reinforcing my skills and passion for system design.
 
 
-
+---
 
 ## Architecture
 
@@ -84,17 +83,9 @@ The system is divided into four major components, orchestrated to work seamlessl
 
 
 
-
 ---
-## Workflow
 
-1. **User Authentication**: Users log in via Google, GitHub, or manual auth, with data stored in PostgreSQL.
-2. **Problem Selection**: Users browse problems fetched from PostgreSQL and select one to solve.
-3. **Code Submission**: Users write or upload code, which is saved to PostgreSQL and queued in RabbitMQ.
-4. **Real-Time Updates**: The WebSocket server delivers statuses (e.g., “Queued,” “Running on Test 1”) from RabbitMQ’s fanout exchange.
-5. **Code Execution**: The Python Worker processes the queued code, sends it to the Judge (via DinD), and evaluates outputs.
-6. **Verdict Delivery**: The Judge returns verdicts (e.g., “Accepted,” “Wrong Answer”) to the Worker, which updates PostgreSQL and notifies the user via WebSocket.
-7. **Problem Setting**: Setters submit problems and test cases, which are queued and processed similarly.
+
 
 ## 📈 Workflow Overview
 
@@ -112,14 +103,11 @@ WebSocket server sends verdict → User sees it in real-time
 
 Below is demonstrations of key workflows:
 
-### Code Submission and Real-Time Status
-![Submission Demo](docs/demo-submission.gif) <!-- Replace with actual GIF URL -->
-
-
-
+![Submission Demo](docs/OnlineJudgeDemo.gif) <!-- Replace with actual GIF URL -->
 
 
 ---
+
 
 ## Getting Started
 
@@ -138,7 +126,7 @@ Before you begin, ensure you have the following installed on your system:
 1.  **Clone the Repository**:
     First, get the project files onto your local machine.
     ```bash
-    git clone <your-repository-url>
+    git clone https://github.com/Sowrav14/OnlineJudge.git
     cd OnlineJudge
     ```
 
@@ -166,12 +154,7 @@ Before you begin, ensure you have the following installed on your system:
     ```
     You should now see the OnlineJudge landing page!
 
----
 
-
-
-
----
 
 ## My Journey, Passion & Future Enhancements
 
@@ -203,12 +186,7 @@ Building upon the foundation of OnlineJudge, I am enthusiastic about continuing 
 
 This OnlineJudge project is just the beginning of my journey into building high-performance, resilient, and engaging software.
 
----
 
-
-
-
----
 
 ## Contributing
 
@@ -239,12 +217,11 @@ We welcome contributions to the OnlineJudge project! Whether you're fixing a bug
 
 We appreciate your effort and time in contributing to this project!
 
----
-
-
 
 
 ---
+
+
 
 ## 📫 Contact
 
