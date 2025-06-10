@@ -1,12 +1,15 @@
 # OnlineJudge: A Modern Competitive Programming Platform
 
-![OnlineJudge Banner](https://via.placeholder.com/1200x200.png?text=OnlineJudge+Banner) <!-- Replace with your project banner image -->
+
 
 ## Overview
 
 OnlineJudge is a dynamic, full-stack web application designed to emulate the functionality of competitive programming platforms like Codeforces and LeetCode. It allows users to browse problem statements, submit code in multiple languages (C++, Python, Java, JavaScript), view real-time submission statuses, and check their submission history. Problem setters can add new problems with hidden test cases, instantly integrated into the platform. This project is a testament to my passion for building scalable, real-time systems and mastering modern development tools to create a seamless user experience.
 
 My goal was to create a practical yet elegant system to practice and showcase my skills in a variety of technologies, from frontend frameworks to message queues and containerization. OnlineJudge is not about reinventing the wheel but about exploring how these technologies come together to solve real-world problems, fueling my curiosity to dive deeper into system design, distributed systems, and competitive programming platforms.
+
+
+
 
 ## Features
 
@@ -19,24 +22,8 @@ My goal was to create a practical yet elegant system to practice and showcase my
 - **Scalable Architecture**: Handles multiple submissions concurrently using RabbitMQ queues and fanout exchanges.
 - **Isolated Code Execution**: Uses Docker containers to securely execute and evaluate code against test cases.
 
-## Tech Stack
 
-This project was an opportunity to master and integrate a diverse set of technologies, each chosen for its specific strengths:
 
-- **Next.js**: A React-based framework for building a fast, server-rendered frontend with an intuitive developer experience.
-- **NextAuth.js**: Provides secure authentication with Google OAuth, GitHub OAuth, and manual login, ensuring robust user management.
-- **ShadCN UI**: A modern, customizable UI component library for creating a sleek, user-friendly interface.
-- **PostgreSQL**: A powerful relational database for storing user data, problems, submissions, and test cases.
-- **Prisma ORM**: Simplifies database interactions with type-safe queries and schema migrations.
-- **RabbitMQ**: Implements a queue for code submissions and a fanout exchange for real-time status updates, enabling scalability and decoupled communication.
-- **WebSocket (Node.js + TypeScript)**: Powers real-time updates for submission statuses, delivering a dynamic user experience.
-- **Docker**: Containerizes the Judge component for secure, isolated code execution and simplifies deployment with Docker Compose.
-- **Docker-in-Docker (DinD)**: Allows the Judge to run nested containers for executing user code in a controlled environment.
-- **Python Worker**: Manages code processing, test case execution, and problem storage, leveraging Python’s scripting capabilities.
-- **Bash & Python Scripting**: Used within the Judge to execute code and compare outputs against test cases.
-- **Supported Languages**: C++, Python, Java, and JavaScript for code submissions, broadening accessibility for users.
-
----
 
 ## 🔧 Tech Stack Breakdown
 
@@ -57,11 +44,17 @@ This project was an opportunity to master and integrate a diverse set of technol
 
 Each technology was carefully selected to deepen my understanding of full-stack development, real-time systems, and containerization. This project allowed me to explore how these tools interact in a production-like environment, reinforcing my skills and passion for system design.
 
+
+
+
 ## Architecture
 
 The system is divided into four major components, orchestrated to work seamlessly:
 
 ![Architecture Diagram](docs/OnlineJudgeArchitecture.png) <!-- Replace with actual diagram URL -->
+
+
+
 
 
 ## 🧠 Project Components
@@ -89,6 +82,9 @@ The system is divided into four major components, orchestrated to work seamlessl
 - Compiles/runs inside Docker-in-Docker  
 - Returns granular verdicts (Accepted, WA, TLE, MLE, RE, etc.)  
 
+
+
+
 ---
 ## Workflow
 
@@ -100,6 +96,18 @@ The system is divided into four major components, orchestrated to work seamlessl
 6. **Verdict Delivery**: The Judge returns verdicts (e.g., “Accepted,” “Wrong Answer”) to the Worker, which updates PostgreSQL and notifies the user via WebSocket.
 7. **Problem Setting**: Setters submit problems and test cases, which are queued and processed similarly.
 
+## 📈 Workflow Overview
+
+```plaintext
+User → Auth → Problem Page → Select Problem → Code Submission
+  ↓                                       ↓
+DB ← Submission saved        ←     Code sent to Queue
+  ↓
+Worker processes → Executes with Judge → Publishes Verdict
+  ↓
+WebSocket server sends verdict → User sees it in real-time
+```
+
 ## Demo
 
 Below is demonstrations of key workflows:
@@ -107,74 +115,147 @@ Below is demonstrations of key workflows:
 ### Code Submission and Real-Time Status
 ![Submission Demo](docs/demo-submission.gif) <!-- Replace with actual GIF URL -->
 
-## Installation and Setup
 
-See the [Setup Guide](docs/setup-guide.md) for detailed instructions.
 
-### Quick Start
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/onlinejudge.git
-   cd onlinejudge
-   ```
-2. **Install Dependencies**:
-   ```bash
-   npm install
-   pip install -r requirements.txt
-   ```
-3. **Set Up Environment Variables**:
-   Create a `.env` file:
-   ```env
-   DATABASE_URL=postgresql://user:password@localhost:5432/onlinejudge
-   NEXTAUTH_SECRET=your_secret
-   GOOGLE_CLIENT_ID=your_google_client_id
-   GOOGLE_CLIENT_SECRET=your_google_client_secret
-   GITHUB_CLIENT_ID=your_github_client_id
-   GITHUB_CLIENT_SECRET=your_github_client_secret
-   RABBITMQ_URL=amqp://guest:guest@localhost:5672/
-   ```
-4. **Run Migrations**:
-   ```bash
-   npx prisma migrate dev
-   ```
-5. **Build Judge Image**:
-   ```bash
-   docker build -t onlinejudge-judge ./judge
-   ```
-6. **Start Services**:
-   ```bash
-   docker-compose up -d
-   ```
-7. **Access the App**:
-   Open `http://localhost:3000`.
 
-## Documentation
-- [Architecture Overview](docs/architecture.md)
-- [Setup Guide](docs/setup-guide.md)
-- [Usage Guide](docs/usage-guide.md)
-- [Contributing](docs/contributing.md)
 
-## Future Plans
+---
 
-OnlineJudge is a stepping stone in my journey to master system design and distributed systems. In the future, I plan to:
-- Optimize performance with caching (e.g., Redis) and load balancing.
-- Add features like leaderboards, contests, and code analysis tools.
-- Deepen my expertise in RabbitMQ patterns, Kubernetes, and CI/CD pipelines.
-- Open-source the project to collaborate and learn from the community.
+## Getting Started
 
-My passion for building scalable, user-focused systems drives me to explore complex challenges in competitive programming platforms and beyond.
+To run OnlineJudge locally, follow these steps:
+
+### Prerequisites
+
+Before you begin, ensure you have the following installed on your system:
+
+* **Docker and Docker Compose**: For containerization and running various services.
+* **Node.js** (with npm): For the frontend (Next.js) and WebSocket server.
+* **Python**: For the Python Worker.
+
+### Steps
+
+1.  **Clone the Repository**:
+    First, get the project files onto your local machine.
+    ```bash
+    git clone <your-repository-url>
+    cd OnlineJudge
+    ```
+
+2.  **Set Up Environment Variables**:
+    Create those `.env` files in the in place of `.env.sample` files in respective directories of the project. These files will store sensitive information and configuration settings. Populate it with the necessary variables, including database connection strings, OAuth credentials, and RabbitMQ connection details as shown there.
+
+3.  **Build The Judge Docker Image**:
+    Navigate into the `the-judge` directory and build the Docker image for our code execution environment. We'll tag it as `the-judge`.
+    ```bash
+    cd the-judge
+    docker build -t the-judge .
+    cd ..
+    ```
+
+4.  **Launch All Services with Docker Compose**:
+    Ensure your Docker daemon is running (e.g., Docker Desktop). From the root directory of the project, use Docker Compose to build and start all the services defined in `docker-compose.yml`. This command will handle setting up PostgreSQL, RabbitMQ, the Next.js frontend, the Node.js WebSocket server, and the Python Worker.
+    ```bash
+    docker-compose up --build
+    ```
+
+5.  **Access OnlineJudge**:
+    Once all services are up and running, open your web browser and navigate to:
+    ```
+    http://localhost:3000
+    ```
+    You should now see the OnlineJudge landing page!
+
+---
+
+
+
+
+---
+
+## My Journey, Passion & Future Enhancements
+
+This project isn’t just another online judge — it’s a canvas for my learning and a testament to applying technologies I've studied in a challenging, high-level project. Building OnlineJudge from the ground up has been an incredibly rewarding experience, allowing me to dive deep into a diverse set of technologies and architect a complex, real-time system.
+
+My passion for competitive programming, coupled with a strong desire to understand the underlying mechanisms of online judges, fueled the development of this platform. I specifically chose to integrate and explore:
+
+* **Asynchronous Systems with RabbitMQ**: Mastering message queuing and fanout exchanges for efficient task processing and real-time status updates.
+* **WebSockets for Real-time Experiences**: Building a dedicated server to provide instant feedback on submission statuses.
+* **Dockerization of Isolated Environments**: Crafting "The Judge" as a secure, containerized execution environment, including the advanced use of Docker-in-Docker.
+* **Database Modeling with Prisma & PostgreSQL**: Designing and managing robust data structures for problems, submissions, and user information.
+* **Secure Authentication Flows with NextAuth & OAuth**: Implementing flexible and secure user authentication via manual credentials, Google, and GitHub.
+* **Clean & Responsive Frontend with Next.js & ShadCN UI**: Developing a modern, performant, and aesthetically pleasing user interface.
+
+This project has solidified my understanding of how various components of a modern web application integrate and communicate to deliver a seamless user experience. It has sparked a deeper interest in:
+
+### Future Aspirations & Enhancements
+
+Building upon the foundation of OnlineJudge, I am enthusiastic about continuing to learn and contribute to projects that push the boundaries of what's possible with web technologies. My future plans and areas of deep-dive exploration include:
+
+* **Distributed Systems**: Further exploring concepts like fault tolerance, consistency, and partitioning in large-scale distributed environments.
+* **Container Orchestration (Kubernetes)**: Delving deeper into Kubernetes for managing and scaling the microservices of an online judge system, ensuring high availability and efficient resource utilization.
+* **Performance Optimization**: Investigating advanced techniques for optimizing code execution time, memory footprint, and overall resource utilization within the judging system.
+* **Security in Sandboxed Environments**: Researching more sophisticated methods for securing code execution in untrusted environments to prevent exploits and ensure system integrity.
+* **AI-Assisted Feedback**: Exploring the integration of AI to provide more insightful and personalized feedback on user submissions beyond just correctness.
+* **Expanded Language Support**: Adding support for more competitive programming languages like Rust and Go.
+* **Caching with Redis**: Implementing Redis for caching frequently accessed data (e.g., problem statements, common test cases) to improve performance and reduce database load.
+* **CI/CD with GitHub Actions**: Setting up automated Continuous Integration and Continuous Deployment pipelines to streamline development, testing, and deployment processes.
+
+This OnlineJudge project is just the beginning of my journey into building high-performance, resilient, and engaging software.
+
+---
+
+
+
+
+---
 
 ## Contributing
 
-See [Contributing](docs/contributing.md) for guidelines.
+We welcome contributions to the OnlineJudge project! Whether you're fixing a bug, adding a new feature, or improving documentation, your help is appreciated.
 
+### How to Contribute
 
-## Contact
+1.  **Fork the repository**.
+2.  **Create a new branch** for your feature or bug fix:
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
+    or
+    ```bash
+    git checkout -b bugfix/issue-description
+    ```
+3.  **Make your changes**. Ensure your code adheres to the project's style guidelines.
+4.  **Write clear, concise commit messages**.
+5.  **Push your branch** to your forked repository.
+6.  **Open a Pull Request (PR)** to the `main` branch of the original repository.
 
-Reach out for questions or collaboration:
-- GitHub: [yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
+### Guidelines
+
+* **Be descriptive** in your pull request. Explain the problem your PR solves and how you've addressed it.
+* **Test your changes thoroughly** before submitting a PR.
+* **Respect existing code style**.
+* **Be patient** during the review process.
+
+We appreciate your effort and time in contributing to this project!
 
 ---
+
+
+
+
+---
+
+## 📫 Contact
+
+If you found this project interesting or have any questions, feedback, or just want to connect, feel free to reach out!
+
+* **💼 LinkedIn**: [[Sowrav nath](https://www.linkedin.com/in/sowrav-nath/)]
+* **📧 Email**: [sowravvnath@email.com](mailto:sowravvnath@email.com)
+* **🧑‍💻 GitHub**: [@Sowrav14](https://github.com/Sowrav14)
+
+---
+
+
 
 *Built with passion to learn, create, and inspire.*
