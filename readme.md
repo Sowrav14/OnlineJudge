@@ -1,103 +1,12 @@
-# OnlineJudge: A Modern Competitive Programming Platform
-
-
+# OnlineJudge: A Full-Stack Competitive Programming Platform
 
 ## Overview
 
-OnlineJudge is a dynamic, full-stack web application designed to emulate the functionality of competitive programming platforms like Codeforces and LeetCode. It allows users to browse problem statements, submit code in multiple languages (C++, Python, Java, JavaScript), view real-time submission statuses, and check their submission history. Problem setters can add new problems with hidden test cases, instantly integrated into the platform. This project is a testament to my passion for building scalable, real-time systems and mastering modern development tools to create a seamless user experience.
+**OnlineJudge** is a full-stack web application inspired by platforms like Codeforces and LeetCode. It enables users to solve coding problems, submit solutions in various languages (C++, Python, Java, JavaScript), and receive real-time verdicts. Designed to be scalable, secure, and real-time, the project demonstrates the practical integration of modern technologies across the software stack.
 
-My goal was to create a practical yet elegant system to practice and showcase my skills in a variety of technologies, from frontend frameworks to message queues and containerization. OnlineJudge is not about reinventing the wheel but about exploring how these technologies come together to solve real-world problems, fueling my curiosity to dive deeper into system design, distributed systems, and competitive programming platforms.
-
-
-
-
-## Features
-
-- **User Authentication**: Supports Google OAuth, GitHub OAuth, and manual authentication for secure access.
-- **Problem Browsing**: Displays a list of problems fetched from a PostgreSQL database, with details like submission count and acceptance rate.
-- **Code Submission**: Users can write code in an integrated editor or upload files, with automatic language detection.
-- **Real-Time Submission Status**: WebSocket-based updates show statuses like "Queued," "Running on Test 1," "Accepted," or "Wrong Answer" in real time.
-- **Submission History**: Users can view their past submissions and verdicts.
-- **Problem Setting**: Authorized users can add problems with descriptions and hidden test cases, instantly available on the platform.
-- **Scalable Architecture**: Handles multiple submissions concurrently using RabbitMQ queues and fanout exchanges.
-- **Isolated Code Execution**: Uses Docker containers to securely execute and evaluate code against test cases.
-
-
-
-
-## 🔧 Tech Stack Breakdown
-
-| Component          | Tech Used                              | Purpose                                  |
-|--------------------|--------------------------------------|------------------------------------------|
-| Frontend           | Next.js, ShadCN UI, NextAuth, Prisma, PostgreSQL | UI rendering, authentication, DB access |
-| Authentication     | NextAuth, Google OAuth, GitHub OAuth, Manual | Secure and flexible login                 |
-| Database           | PostgreSQL                           | Stores users, problems, submissions, verdicts |
-| ORM                | Prisma                              | Type-safe DB access                       |
-| Messaging Queue    | RabbitMQ                           | Decoupled communication between components |
-| WebSocket Server   | Node.js, TypeScript, ws            | Real-time status updates                  |
-| Worker             | Python                             | Handles code execution and problem ingestion |
-| Code Executor (The Judge) | Docker, bash, python          | Sandboxed multi-language code runner     |
-| Container Orchestration | Docker Compose, docker-in-docker | Environment management                    |
-
-
-
-Each technology was carefully selected to deepen my understanding of full-stack development, real-time systems, and containerization. This project allowed me to explore how these tools interact in a production-like environment, reinforcing my skills and passion for system design.
-
+This project reflects my interest in system design, distributed computing, and full-stack engineering. Rather than reinventing existing tools, OnlineJudge explores how diverse technologies work together to build a production-ready competitive programming environment.
 
 ---
-
-## Architecture
-
-The system is divided into four major components, orchestrated to work seamlessly:
-
-![Architecture Diagram](docs/OnlineJudgeArchitecture.png) <!-- Replace with actual diagram URL -->
-
-
-
-
-
-## 🧠 Project Components
-
-1️⃣ **Frontend**  
-- Built with Next.js and styled using ShadCN UI  
-- Code editor with auto language detection and syntax highlighting  
-- Integrated with NextAuth for OAuth and manual login  
-- Submission form sends code to backend, receives real-time verdicts  
-
-2️⃣ **WebSocket Server**  
-- Built using ws and Node.js in TypeScript  
-- Connected clients (submitters) receive updates on submission progress  
-- Publishes verdicts via RabbitMQ fanout exchange  
-
-3️⃣ **Python Worker**  
-- Pulls submissions and problem definitions from RabbitMQ queues  
-- Prepares input/output, executes code using the the-judge image  
-- Publishes status at each stage back to exchange for real-time updates  
-- Cleans up after processing  
-
-4️⃣ **The Judge (Docker Image)**  
-- Contains execution environments for C++, Python, Java, and JavaScript  
-- Accepts code, input, and language  
-- Compiles/runs inside Docker-in-Docker  
-- Returns granular verdicts (Accepted, WA, TLE, MLE, RE, etc.)  
-
-
-
----
-
-
-
-## 📈 Workflow Overview
-
-```plaintext
-User → Auth → Problem Page → Select Problem → Code Submission
-  ↓                                       ↓
-DB ← Submission saved        ←     Code sent to Queue
-  ↓
-Worker processes → Executes with Judge → Publishes Verdict
-  ↓
-WebSocket server sends verdict → User sees it in real-time
-```
 
 ## Demo
 
@@ -105,9 +14,84 @@ Below is demonstrations of key workflows:
 
 ![Submission Demo](docs/OnlineJudgeDemo.gif) <!-- Replace with actual GIF URL -->
 
+---
+
+## Features
+
+- **Authentication**: Supports Google, GitHub, and manual login via NextAuth.
+- **Problem Browsing**: View problems with metadata like difficulty and acceptance rate.
+- **Code Submission**: Submit code via an in-browser editor or file upload with auto language detection.
+- **Real-Time Status**: WebSocket-powered live verdict updates.
+- **Submission History**: Review past submissions and verdicts.
+- **Problem Setting**: Add new problems with hidden test cases.
+- **Scalable Queue**: RabbitMQ handles concurrent submissions efficiently.
+- **Secure Execution**: Code runs in sandboxed Docker environments.
 
 ---
 
+## Tech Stack
+
+| Component            | Technology Used                  |
+| -------------------- | -------------------------------- |
+| Frontend             | Next.js, ShadCN UI               |
+| Authentication       | NextAuth, OAuth (Google, GitHub) |
+| Database             | PostgreSQL                       |
+| ORM                  | Prisma                           |
+| Message Queue        | RabbitMQ                         |
+| WebSocket Server     | Node.js, TypeScript, ws          |
+| Worker               | Python                           |
+| Code Execution       | Docker, Docker-in-Docker         |
+| Container Management | Docker Compose                   |
+
+---
+
+## System Architecture
+
+The platform comprises four primary components:
+
+1. **Frontend** (Next.js)
+2. **Backend API** (Python)
+3. **Message Queue** (RabbitMQ)
+4. **Code Judge** (Docker container with isolated runtimes)
+
+<details>
+<summary><strong>Simplified Workflow</strong></summary>
+
+<br>
+
+![Architecture Diagram](docs/OnlineJudgeArchitecture.png) <!-- Replace with actual diagram URL -->
+
+</details>
+
+---
+
+## Project Components
+
+### 1. Frontend
+
+- Built with **Next.js** and **ShadCN UI**.
+- Includes an editor with syntax highlighting and language detection.
+- Uses **NextAuth** for OAuth and manual login.
+
+### 2. WebSocket Server
+
+- Built with **Node.js** and **TypeScript** using `ws`.
+- Delivers real-time submission updates to users.
+- Listens for verdicts via **RabbitMQ** fanout exchange.
+
+### 3. Python Worker
+
+- Fetches submissions from RabbitMQ.
+- Executes them in a Dockerized environment.
+- Streams verdicts back via WebSocket.
+
+### 4. The Judge (Docker)
+
+- Secure, sandboxed execution using Docker-in-Docker.
+- Supports C++, Python, Java, and JavaScript.
+- Returns verdicts like: `Accepted`, `WA`, `TLE`, `RE`, `Running on Test-X` etc.
+
+---
 
 ## Getting Started
 
@@ -154,7 +138,7 @@ Before you begin, ensure you have the following installed on your system:
     ```
     You should now see the OnlineJudge landing page!
 
-
+---
 
 ## My Journey, Passion & Future Enhancements
 
@@ -186,7 +170,7 @@ Building upon the foundation of OnlineJudge, I am enthusiastic about continuing 
 
 This OnlineJudge project is just the beginning of my journey into building high-performance, resilient, and engaging software.
 
-
+---
 
 ## Contributing
 
@@ -217,10 +201,7 @@ We welcome contributions to the OnlineJudge project! Whether you're fixing a bug
 
 We appreciate your effort and time in contributing to this project!
 
-
-
 ---
-
 
 
 ## 📫 Contact
